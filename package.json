@@ -1,0 +1,17 @@
+{
+    "name": "image-tag-organizer",
+    "preferGlobal": true,
+    "version": "0.0.1",
+    "author": "Clint Fleetwood <clint.fleetwood@gmail.com>",
+    "description": "A simple image filter based on tags",
+    "license": "MIT",
+    "engines": {
+        "node": ">=0.10"
+    },
+    "scripts": {
+        "start": "node ./app.js"
+    },
+    "dependencies": {
+        "node-iptc":"*"        
+    }
+}
