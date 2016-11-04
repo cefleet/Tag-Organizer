@@ -1,0 +1,103 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Tag-Selector</title>
+  <meta name="description" content="Tag-Selector">
+
+  <!--<link rel="stylesheet" href="css/styles.css?v=1.0">-->
+
+</head>
+
+<body>
+  <div id='tags'></div>
+  <button onclick="getImages()">Get Images</button>
+  <div id = 'images'></div>
+
+  <script>
+      var getImages = function(){
+        var qury = "";
+        var checked = []
+        var cbs = document.getElementById("tags").childNodes
+        for(var i = 0; i < cbs.length; i++){
+          if(cbs[i].nodeName == 'INPUT'){
+            if(cbs[i].checked == true){
+              checked.push(cbs[i].id)
+            }
+          }
+        }
+        for(var i =0; i < checked.length; i++){
+          if(i == 0){
+            qury = '/?tag'+i+"="+checked[i]
+          }else {
+            qury = qury+'&tag'+i+"="+checked[i]
+          }
+        }
+        TINY.ajax.call('/getImages'+qury, 'content', 'handleImages');
+      }
+
+    TINY={};
+
+    function T$(id){return document.getElementById(id)}
+
+    TINY.ajax=function(){
+      return{
+        call:function(u,d,f,p){
+            var x=window.XMLHttpRequest?new XMLHttpRequest():new ActiveXObject('Microsoft.XMLHTTP');
+            x.onreadystatechange=function(){
+                if(x.readyState==4&&x.status==200){
+                  ACTIONS[f](x.responseText)
+                }
+            };
+            if(p){
+                x.open('POST',u,true);
+                x.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+                x.send(p)
+            }else{
+                x.open('GET',u,true);
+                x.send(null)
+            }
+          }
+      };
+    }();
+
+    TINY.ajax.call('/getTags', 'content', 'handleTags');
+    TINY.ajax.call('/getImages', 'content', 'handleImages');
+    ACTIONS = {
+
+        handleImages: function(data){
+          var imageElem = document.getElementById("images")
+          imageElem.innerHTML = ''
+          var images = JSON.parse(data)
+          for(var i = 0; i < images.length; i++){
+            var d = document.createElement("div")
+            d.id = images[i].id+'_'+images[i].name
+            d.appendChild(document.createTextNode(images[i].name))
+            imageElem.appendChild(d)
+          }
+        },
+
+        handleTags: function(data){
+          var tagElem = document.getElementById("tags")
+          var tags = JSON.parse(data)
+            for(var i = 0;i < tags.length; i++){
+              if(tags[i].name != '_Digikam_Internal_Tags_'){
+
+                var t = document.createElement("input")
+                t.type = "checkbox";
+                t.id = tags[i].name
+                var l = document.createElement('label')
+                l.htmlFor = tags[i].name
+                l.appendChild(document.createTextNode(tags[i].name))
+                tagElem.appendChild(t)
+                tagElem.appendChild(l)
+              }
+            }
+        }
+    };
+
+  </script>
+</body>
+</html>

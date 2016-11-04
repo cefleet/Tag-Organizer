@@ -12,6 +12,7 @@
         "start": "node ./app.js"
     },
     "dependencies": {
-        "node-iptc":"*"        
+        "sqlite3":"*",
+        "express":"*"
     }
 }
