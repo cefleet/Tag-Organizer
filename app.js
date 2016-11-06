@@ -5,6 +5,8 @@ var db = new sqlite3.Database("database.db");
 var express = require('express')
 var app = express()
 
+app.use(express.static('images'))
+
 app.get('/', function(req,res){
   res.sendFile('index.html', { root: __dirname })
 });
@@ -15,6 +17,8 @@ app.get('/getTags/', function(req,res){
       res.send(data)
     });
 });
+
+  
 
 app.get('/getImages/', function (req, res) {
   var tags = req.query

@@ -6,14 +6,14 @@
 
   <title>Tag-Selector</title>
   <meta name="description" content="Tag-Selector">
-
-  <!--<link rel="stylesheet" href="css/styles.css?v=1.0">-->
-
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 
 <body>
-  <div id='tags'></div>
-  <button onclick="getImages()">Get Images</button>
+  <div class='panel panel-default'>
+    <div class="panel-body" id='tags'></div>
+  </div>
+  <button class="btn btn-primary" onclick="getImages()">Get Images</button>
   <div id = 'images'></div>
 
   <script>
@@ -22,9 +22,10 @@
         var checked = []
         var cbs = document.getElementById("tags").childNodes
         for(var i = 0; i < cbs.length; i++){
-          if(cbs[i].nodeName == 'INPUT'){
-            if(cbs[i].checked == true){
-              checked.push(cbs[i].id)
+          console.log(cbs[i].childNodes[0])
+          if(cbs[i].childNodes[0].nodeName == 'INPUT'){
+            if(cbs[i].childNodes[0].checked == true){
+              checked.push(cbs[i].childNodes[0].id)
             }
           }
         }
@@ -72,10 +73,16 @@
           imageElem.innerHTML = ''
           var images = JSON.parse(data)
           for(var i = 0; i < images.length; i++){
-            var d = document.createElement("div")
-            d.id = images[i].id+'_'+images[i].name
-            d.appendChild(document.createTextNode(images[i].name))
-            imageElem.appendChild(d)
+            var d = document.createElement("div");
+            d.id = images[i].id+'_'+images[i].name;
+            d.class = 'imageLink';
+            var a = document.createElement("a");
+            a.href = "/"+images[i].name;
+            a.id = images[i].name;
+            a.className = 'btn btn-default btn-lg btn-block'
+            a.appendChild(document.createTextNode(images[i].name));
+            d.appendChild(a);
+            imageElem.appendChild(d);
           }
         },
 
@@ -84,14 +91,15 @@
           var tags = JSON.parse(data)
             for(var i = 0;i < tags.length; i++){
               if(tags[i].name != '_Digikam_Internal_Tags_'){
-
                 var t = document.createElement("input")
                 t.type = "checkbox";
                 t.id = tags[i].name
                 var l = document.createElement('label')
                 l.htmlFor = tags[i].name
+                l.className = "checkbox-inline"
+                l.appendChild(t)
                 l.appendChild(document.createTextNode(tags[i].name))
-                tagElem.appendChild(t)
+              //  tagElem.appendChild(t)
                 tagElem.appendChild(l)
               }
             }
