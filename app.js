@@ -7,6 +7,10 @@ var app = express()
 
 app.use(express.static('images'))
 
+app.get('/icon.png', function(req,res){
+  res.sendFile("imageIcon.png", {root:__dirname})
+})
+
 app.get('/', function(req,res){
   res.sendFile('index.html', { root: __dirname })
 });
@@ -18,8 +22,6 @@ app.get('/getTags/', function(req,res){
     });
 });
 
-  
-
 app.get('/getImages/', function (req, res) {
   var tags = req.query
   tagArray = []
@@ -27,6 +29,7 @@ app.get('/getImages/', function (req, res) {
     tagArray.push(tags[tag]);
   }
   var sql = ''
+  console.log(tagArray);
   if(tagArray.length == 0){
     sql = "SELECT Images.id,Images.name FROM Images"
   } else {
