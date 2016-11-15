@@ -16,6 +16,8 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
+          <h1 id="modalHeader"></h1>
+          <div id="imageTags"></div>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body" id="modalBody">
@@ -30,7 +32,7 @@
           <div class="panel-body" id='tags'></div>
         </div>
       <!--  <button class="btn btn-primary" onclick="getImages()">Get Images</button> -->
-        <button class="btn btn-warning" onclick="clearFilter()">Clear Filter<span class="badge" id="filterCount">0</span></button>
+        <button class="btn btn-warning" onclick="clearFilter()">Clear Filter <span class="badge" id="filterCount">0</span></button>
       </div>
       <div class="col-md-9" id= "images">
 
@@ -38,6 +40,10 @@
     </div>
   </div>
   <script>
+    String.prototype.replaceAll = function(search, replacement) {
+      var target = this;
+      return target.split(search).join(replacement);
+    };
     var clearFilter = function(){
       var cbs = document.getElementById("tags").childNodes
       for(var i = 0; i < cbs.length; i++){
@@ -93,10 +99,12 @@
       };
     }();
 
-    var setImage = function(im){
-
+    var setImage = function(im,title){
+      var head = document.getElementById("modalHeader");
+      head.innerHTML = title;
       var img = document.createElement("img");
       img.src = "/"+im
+
       img.setAttribute("style", "max-width:100%");
       img.addEventListener("load", function() {
           var m =document.getElementById("modalBody")
@@ -121,26 +129,33 @@
           for(var i = 0; i < images.length; i++){
             var d = document.createElement("div");
             d.id = images[i].id+'_'+images[i].displayName;
-            d.className = 'col-xs-6 col-md-3';
+            d.className = 'col-xs-6 col-md-4';
             var a = document.createElement("a");
-            a.type="button"
+
             a.setAttribute("data-toggle","modal")
             a.setAttribute("data-target","#myModal")
-            a.setAttribute("data-value", images[i].name);
+            a.setAttribute("data-image", images[i].name);
+            a.setAttribute("data-title", images[i].displayName);
+            a.setAttribute("data-tags","");
             //a.href = "/"+images[i].name;
             a.href = '#';
+            a.className = "btn btn-default btn-lg btn-block"
             a.id = images[i].name;
-            a.className = 'thumbnail'
-            var im = document.createElement("img");
-            im.src = "/icon.png";
-            a.appendChild(im);
+          //  a.className = 'thumbnail'
+          //  var im = document.createElement("img");
+          //  im.src = "/icon.png";
+          //  a.appendChild(im);
             var name = images[i].displayName
-
-            a.appendChild(document.createTextNode(name));
+            name = name.replaceAll("_"," ");
+            console.log(name);
+            var h = document.createElement("h2");
+            h.appendChild(document.createTextNode(name))
+            a.setAttribute("style","white-space: normal")
+            a.appendChild(h);
             d.appendChild(a);
             imageElem.appendChild(d);
             a.onclick = function(event) {
-              setImage(event.target.getAttribute("data-value"))
+              setImage(event.target.getAttribute("data-image"),event.target.getAttribute("data-title"))
             };
           }
         },
