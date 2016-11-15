@@ -29,7 +29,8 @@
         <div class='panel panel-default'>
           <div class="panel-body" id='tags'></div>
         </div>
-        <button class="btn btn-primary" onclick="getImages()">Get Images</button>
+      <!--  <button class="btn btn-primary" onclick="getImages()">Get Images</button> -->
+        <button class="btn btn-warning" onclick="clearFilter()">Clear Filter<span class="badge" id="filterCount">0</span></button>
       </div>
       <div class="col-md-9" id= "images">
 
@@ -37,6 +38,15 @@
     </div>
   </div>
   <script>
+    var clearFilter = function(){
+      var cbs = document.getElementById("tags").childNodes
+      for(var i = 0; i < cbs.length; i++){
+        if(cbs[i].childNodes[0].childNodes[0].nodeName == 'INPUT'){
+          cbs[i].childNodes[0].childNodes[0].checked = false;
+        }
+      }
+      getImages()
+    }
       var getImages = function(){
         var qury = "";
         var checked = []
@@ -102,9 +112,12 @@
     ACTIONS = {
 
         handleImages: function(data){
+
           var imageElem = document.getElementById("images")
           imageElem.innerHTML = ''
           var images = JSON.parse(data)
+          var f = document.getElementById("filterCount")
+          f.innerHTML = images.length;
           for(var i = 0; i < images.length; i++){
             var d = document.createElement("div");
             d.id = images[i].id+'_'+images[i].displayName;
@@ -140,6 +153,7 @@
                 var t = document.createElement("input")
                 t.type = "checkbox";
                 t.id = tags[i].name
+                t.addEventListener('click', getImages);
                 var l = document.createElement('label')
                 l.appendChild(t)
                 l.appendChild(document.createTextNode(tags[i].name))
