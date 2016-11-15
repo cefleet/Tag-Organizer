@@ -42,7 +42,6 @@
         var checked = []
         var cbs = document.getElementById("tags").childNodes
         for(var i = 0; i < cbs.length; i++){
-          console.log(cbs[i].childNodes[0].childNodes[0])
           if(cbs[i].childNodes[0].childNodes[0].nodeName == 'INPUT'){
             if(cbs[i].childNodes[0].childNodes[0].checked == true){
               checked.push(cbs[i].childNodes[0].childNodes[0].id)
@@ -85,12 +84,16 @@
     }();
 
     var setImage = function(im){
-      var m = document.getElementById("modalBody")
-      m.innerHTML = "";
+
       var img = document.createElement("img");
       img.src = "/"+im
       img.setAttribute("style", "max-width:100%");
-      m.appendChild(img)
+      img.addEventListener("load", function() {
+          var m =document.getElementById("modalBody")
+          m.innerHTML = "";
+          m.appendChild(img)
+          // execute drawImage statements here
+      }, false);
 
     }
 
@@ -103,7 +106,6 @@
           imageElem.innerHTML = ''
           var images = JSON.parse(data)
           for(var i = 0; i < images.length; i++){
-            console.log(images[i]);
             var d = document.createElement("div");
             d.id = images[i].id+'_'+images[i].displayName;
             d.className = 'col-xs-6 col-md-3';
@@ -120,12 +122,12 @@
             im.src = "/icon.png";
             a.appendChild(im);
             var name = images[i].displayName
-          
+
             a.appendChild(document.createTextNode(name));
             d.appendChild(a);
             imageElem.appendChild(d);
             a.onclick = function(event) {
-              setImage(event.srcElement.getAttribute("data-value"))
+              setImage(event.target.getAttribute("data-value"))
             };
           }
         },
