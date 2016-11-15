@@ -103,8 +103,9 @@
           imageElem.innerHTML = ''
           var images = JSON.parse(data)
           for(var i = 0; i < images.length; i++){
+            console.log(images[i]);
             var d = document.createElement("div");
-            d.id = images[i].id+'_'+images[i].name;
+            d.id = images[i].id+'_'+images[i].displayName;
             d.className = 'col-xs-6 col-md-3';
             var a = document.createElement("a");
             a.type="button"
@@ -118,10 +119,8 @@
             var im = document.createElement("img");
             im.src = "/icon.png";
             a.appendChild(im);
-            var name = images[i].name
-            name = name.replace(".png","")
-            name = name.replace(".jpg","")
-
+            var name = images[i].displayName
+          
             a.appendChild(document.createTextNode(name));
             d.appendChild(a);
             imageElem.appendChild(d);
