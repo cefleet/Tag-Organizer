@@ -1,9 +1,21 @@
 var fs = require('fs');
 var sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database("database.db");
-
+var async = require('async');
 var express = require('express')
 var app = express()
+
+var allTags = {}
+
+db.all('SELECT name,id FROM Tags WHERE pid = 0', function(err,data){
+  allTags = data
+  //Yes this is blocking IDC
+  for(var i =0; i< data.length; i++){
+    if(data[i].id){
+      allTags['_'+data[i].id] = data[i].name
+    }
+  }
+});
 
 app.use(express.static('images'))
 
@@ -16,7 +28,7 @@ app.get('/', function(req,res){
 });
 
 app.get('/getTags/', function(req,res){
-    var sql = 'SELECT name FROM Tags WHERE pid = 0';
+    var sql = 'SELECT name,id FROM Tags WHERE pid = 0';
     db.all(sql, function(err,data){
       res.send(data)
     });
@@ -29,7 +41,6 @@ app.get('/getImages/', function (req, res) {
     tagArray.push(tags[tag]);
   }
   var sql = ''
-  console.log(tagArray);
   if(tagArray.length == 0){
     sql = "SELECT Images.id,Images.name,ImageComments.comment as displayName FROM Images JOIN ImageComments ON Images.id = ImageComments.imageid"
   } else {
@@ -41,13 +52,27 @@ app.get('/getImages/', function (req, res) {
       var sql = sql+section+" IN ('"+tagArray[i]+"') ";
     }
   }
-//  var sql = "SELECT Images.id,Images.name FROM Images,Tags,ImageTags WHERE ImageTags.imageid=Images.id AND ImageTags.tagid=Tags.id AND Tags.name ('1ph') INTERSECT SELECT Images.id,Images.name FROM Images,Tags,ImageTags WHERE ImageTags.imageid=Images.id AND ImageTags.tagid=Tags.id AND Tags.name IN ('ecoga') INTERSECT SELECT Images.id,Images.name FROM Images,Tags,ImageTags WHERE ImageTags.imageid=Images.id AND ImageTags.tagid=Tags.id AND Tags.name IN ('2011')";
+
   db.all(sql, function(err, data){
     if(err){
       console.log(err)
     }
-    res.send(data)
-  })
+    async.forEach(data,
+      function(image,callback){
+        var sql = "SELECT tagid FROM ImageTags WHERE imageid = "+image.id;
+        db.all(sql,function(err,tData){
+          image.tags = []
+          for(var i = 0; i < tData.length; i++){
+            image.tags.push(allTags['_'+tData[i].tagid])
+          }
+          callback();
+        })
+      },
+      function(err){
+        if(err){throw err;}
+        res.send(data)
+      });
+    })
 });
 
 app.listen(8080, function () {

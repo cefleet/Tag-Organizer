@@ -13,6 +13,7 @@
     },
     "dependencies": {
         "sqlite3":"*",
-        "express":"*"
+        "express":"*",
+        "async":"*"
     }
 }

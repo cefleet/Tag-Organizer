@@ -40,6 +40,7 @@
     </div>
   </div>
   <script>
+    var masterImages = {}
     String.prototype.replaceAll = function(search, replacement) {
       var target = this;
       return target.split(search).join(replacement);
@@ -99,18 +100,70 @@
       };
     }();
 
-    var setImage = function(im,title){
+    var setImage = function(event){
+      var n = event.target
+      while(n.type != 'submit'){
+        n = n.parentElement
+      }
+      var data = masterImages['_'+n.id];
+      var head = document.getElementById("modalHeader");
+      head.innerHTML = data.displayName;
+      head.appendChild(document.createElement("br"))
+      var s = document.createElement("small");
+      s.id = 'tagList';
+      head.appendChild(s)
+      tags = data.tags
+      for(var i = 0; i < tags.length; i++){
+        if(tags[i] != null){
+          if(i == tags.length-1){
+            s.appendChild(document.createTextNode(tags[i]))
+          } else{
+            s.appendChild(document.createTextNode(tags[i]+', '))
+          }
+        }
+      }
+      var img = document.createElement("img");
+      img.src = "/"+data.name
+
+      img.setAttribute("style", "max-width:100%");
+      $('#myModal').modal("show")
+      img.addEventListener("load", function() {
+          var m = document.getElementById("modalBody")
+          m.innerHTML = "";
+          m.appendChild(img)
+          // execute drawImage statements here
+
+      }, false);
+    };
+
+    var setImage_bob = function(im,title,tags){
       var head = document.getElementById("modalHeader");
       head.innerHTML = title;
+      head.appendChild(document.createElement("br"))
+      var s = document.createElement("small");
+      s.id = 'tagList';
+      head.appendChild(s)
+      tags = JSON.parse(tags)
+      for(var i = 0; i < tags.length; i++){
+        if(tags[i] != null){
+          if(i == tags.length-1){
+            s.appendChild(document.createTextNode(tags[i]))
+          } else{
+            s.appendChild(document.createTextNode(tags[i]+', '))
+          }
+        }
+      }
       var img = document.createElement("img");
       img.src = "/"+im
 
       img.setAttribute("style", "max-width:100%");
+      $('#myModal').modal("show")
       img.addEventListener("load", function() {
-          var m =document.getElementById("modalBody")
+          var m = document.getElementById("modalBody")
           m.innerHTML = "";
           m.appendChild(img)
           // execute drawImage statements here
+
       }, false);
 
     }
@@ -126,36 +179,49 @@
           var images = JSON.parse(data)
           var f = document.getElementById("filterCount")
           f.innerHTML = images.length;
+          masterImages = {}
           for(var i = 0; i < images.length; i++){
+            masterImages['_'+images[i].id] = images[i]
             var d = document.createElement("div");
             d.id = images[i].id+'_'+images[i].displayName;
             d.className = 'col-xs-6 col-md-4';
-            var a = document.createElement("a");
+            var a = document.createElement("button");
 
-            a.setAttribute("data-toggle","modal")
-            a.setAttribute("data-target","#myModal")
-            a.setAttribute("data-image", images[i].name);
-            a.setAttribute("data-title", images[i].displayName);
-            a.setAttribute("data-tags","");
-            //a.href = "/"+images[i].name;
-            a.href = '#';
+          //  a.setAttribute("data-toggle","modal")
+          //  a.setAttribute("data-target","#myModal")
+          //  console.log(JSON.stringify(images[i].tags))
+          //  a.setAttribute("data-image", images[i].name);
+          //  a.setAttribute("data-title", images[i].displayName);
+          //  a.setAttribute("data-tags",JSON.stringify(images[i].tags));
+          //  a.href = '#';
             a.className = "btn btn-default btn-lg btn-block"
-            a.id = images[i].name;
-          //  a.className = 'thumbnail'
-          //  var im = document.createElement("img");
-          //  im.src = "/icon.png";
-          //  a.appendChild(im);
+            a.id = images[i].id;
+
             var name = images[i].displayName
             name = name.replaceAll("_"," ");
-            console.log(name);
-            var h = document.createElement("h2");
+            var h = document.createElement("h3");
             h.appendChild(document.createTextNode(name))
+            h.appendChild(document.createElement("br"))
+            var s = document.createElement("small");
+            s.id = 'tagList';
+            h.appendChild(s)
+            for(var _t = 0; _t < images[i].tags.length; _t++){
+              if(images[i].tags[_t] != null){
+                if(_t == images[i].tags.length-1){
+                  s.appendChild(document.createTextNode(images[i].tags[_t]))
+                } else{
+                  s.appendChild(document.createTextNode(images[i].tags[_t]+', '))
+                }
+              }
+            }
             a.setAttribute("style","white-space: normal")
             a.appendChild(h);
             d.appendChild(a);
             imageElem.appendChild(d);
             a.onclick = function(event) {
-              setImage(event.target.getAttribute("data-image"),event.target.getAttribute("data-title"))
+              //setImage(event.target.getAttribute("data-image"),event.target.getAttribute("data-title"), event.target.getAttribute("data-tags"))
+              //setImage(event.target.id)
+              setImage(event)
             };
           }
         },
